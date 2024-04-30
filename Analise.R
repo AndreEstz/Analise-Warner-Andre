@@ -44,7 +44,7 @@ theme_estat <- function(...) {
     )
   )
 }
-### 1) ----
+### 1) Numero de Lançamentos ----
 # Filtrando o data set
 data_e_lançamentos <- banco %>% select(date_aired,format )
 data_em_ano <- data.frame(year(data_e_lançamentos$date_aired))
@@ -90,8 +90,48 @@ ggplot(data_e_lançamentos) +
   theme_estat()
 ggsave("numero_de_lançamentos.pdf", width = 158, height = 93, units = "mm")     
 
+### 2) Variação IMDB ----
+#Variação da nota IMDB por temporada dos episódios;
+#ideia inicial : Precisa de coluna IMDB SEASON EPISODIOS
+# Tira a média do imdb da temporada e compara??????
+#Colocar eixo x episodios y imdb e colocar em grupos na tag das temporadas
 
+df_imdbeTemp <- banco %>% select(season, imdb)
+excludente1 <- filter(df_imdbeTemp, season == 'Movie')
+excluddente2 <- filter(df_imdbeTemp, season == 'Crossover')
+df_imdbeTemp <- anti_join(df_imdbeTemp, excludente1)
+df_imdbeTemp <- anti_join(df_imdbeTemp, excluddente2)
+#Esse codigo precisa de otimização 
 
+#dispersão?
+df_imdbeTemp %>%
+  mutate(Temporada = case_when(
+    season %>% str_detect("1") ~ "Aumático",
+    season %>% str_detect("2") ~ "Manual"
+  )) %>%
+  ggplot() +
+  aes(x=1:553, y=imdb) +
+  geom_point(aes(colour=season)) +
+  labs(
+    x="Episódios", y="Nota Imdb"
+  ) +
+  theme_estat()
+ggsave("disp_bi.pdf", width = 158, height = 93, units = "mm")
+#Eu posso tirar aqui a concentração dos dados em nota imdb medianas 
 
-
-                                          
+#possivel blox pot
+df_imdbeTemp %>%
+  mutate(Temporada = case_when(
+    season %>% str_detect("1") ~ "Aumático",
+    season %>% str_detect("2") ~ "Manual"
+  )) %>%
+  ggplot() +
+  aes(x=season, y=imdb) +
+  geom_point(aes(colour=season)) +
+  labs(
+    x="Episódios", y="Nota Imdb"
+  ) +
+  theme_estat()
+ggsave("disp_bi.pdf", width = 158, height = 93, units = "mm")
+25
+#Eu posso tirar daqui (em formato box plot de verdade, so n faço agora pq eu tenho reuniao) medidas resumo de cada temporada para a analise
